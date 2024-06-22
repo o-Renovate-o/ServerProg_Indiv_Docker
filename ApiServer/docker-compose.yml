@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+
+  web:
+    container_name: 'aspnetcoreapp'
+    image: 'aspnetcoreapp'
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5000
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:5000"
+      - "443:8000"
+    depends_on:
+      - "postgres"
+    networks:
+      - aspnetcoreapp-network
+
+  postgres:
+    volumes:
+      - ./Database:/docker-entrypoint-initdb.d
+      - ../data:/var/lib/postgresql/data
+    container_name: 'postgres'
+    image: postgres
+    environment:
+      # change this for a "real" app!
+      POSTGRES_PASSWORD: postgres
+    networks:
+      - aspnetcoreapp-network
+
+networks:
+  aspnetcoreapp-network:
+    driver: bridge
